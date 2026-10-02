@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملك أمنمحات الثالث - مشغل الفيديو</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+        /* Custom styling for video container and subtitle overlay */
+        .video-container {
+            position: relative;
+        }
+        /* Custom subtitle display area */
+        #custom-subtitle {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            text-align: center;
+            max-width: 85%;
+            pointer-events: none;
+            transition: opacity 0.2s ease-in-out;
+            opacity: 0;
+            z-index: 20;
+        }
+        #custom-subtitle.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
+
+    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 py-4 px-6 shadow-md">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h1 class="text-xl sm:text-2xl font-bold text-amber-400 flex items-center gap-2">
+                🏛️ الملك أمنمحات الثالث - عصر الدولة الوسطى
+            </h1>
+            <div class="flex items-center gap-2 bg-slate-700/60 p-1.5 rounded-xl border border-slate-600">
+                <span class="text-xs text-slate-300 px-2 font-medium">الترجمة / Subtitles:</span>
+                <button onclick="setSubtitle('ar')" id="btn-ar" class="px-3 py-1 text-xs rounded-lg font-semibold transition-all bg-amber-500 text-slate-950 shadow">العربية</button>
+                <button onclick="setSubtitle('en')" id="btn-en" class="px-3 py-1 text-xs rounded-lg font-semibold transition-all bg-transparent text-slate-300 hover:text-white">English</button>
+                <button onclick="setSubtitle('off')" id="btn-off" class="px-3 py-1 text-xs rounded-lg font-semibold transition-all bg-transparent text-slate-400 hover:text-white">إيقاف</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4 sm:p-6">
+        <div class="w-full max-w-4xl bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+            <div class="video-container relative bg-black aspect-video flex items-center justify-center">
+                <video id="videoPlayer" class="w-full h-full object-contain" controls preload="metadata" poster="https://placehold.co/1280x720/1e293b/fbbf24?text=King+Amenemhat+III">
+                    <source src="3rdamenmhat.mp4" type="video/mp4">
+                    متصفحك لا يدعم تشغيل الفيديو.
+                </video>
+                <!-- Custom Subtitle Overlay Container -->
+                <div id="custom-subtitle"></div>
+            </div>
+            
+            <div class="p-4 sm:p-6 bg-slate-800/90 border-t border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-200">فيديو توثيقي تاريخي</h2>
+                    <p class="text-sm text-slate-400">استعرض إنجازات وأعمال الملك أمنمحات الثالث وسد اللاهون.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="restartVideo()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl text-sm font-medium transition border border-slate-600 flex items-center gap-1.5 shadow">
+                        🔄 إعادة التشغيل
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-800/50 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+        تم تصميم الصفحة لتجربة تفاعلية سلسة ومتجاوبة مع كافة الأجهزة.
+    </footer>
+
+    <script>
+        // SRT Subtitle data embedded directly to guarantee seamless loading and zero CORS issues
+        const subtitlesData = {
+            ar: [
+                { start: 1.0, end: 3.5, text: "الملك أمنمحات الثالث" },
+                { start: 4.5, end: 7.5, text: "وهو واحد من أهم ملوك عصر الدولة الوسطى." },
+                { start: 9.0, end: 13.0, text: "تولى العرش بعد وفاة والده سنوسرت الثالث،" },
+                { start: 13.5, end: 19.0, text: "وتتميز فترة حكمه الطويلة بالهدوء وإنجاز الكثير من المشاريع." },
+                { start: 20.5, end: 21.5, text: "أعماله" },
+                { start: 22.5, end: 30.5, text: "أرسل الملك أمنمحات الثالث العديد من البعثات لاستخراج المعادن، مثل الفيروز والنحاس من شبه جزيرة سيناء،" },
+                { start: 32.5, end: 35.0, text: "والجرانيت من أسوان." },
+                { start: 36.0, end: 42.5, text: "ونتيجة تعرض البلاد لفترات من الجفاف بسبب انخفاض منسوب مياه نهر النيل،" },
+                { start: 42.5, end: 52.5, text: "فقد رأى أمنمحات الثالث أن منخفض الفيوم يمكن أن يكون خزانًا طبيعيًا يمد البلاد بالمياه في فترات الجفاف،" },
+                { start: 53.0, end: 63.5, text: "فأقام سدًا عظيماً عند المدخل الطبيعي لبحيرة موريس (قارون حالياً)، عرف بسد اللاهون لتنظيم دخول المياه وخروجها إلى القناة." },
+                { start: 64.5, end: 70.0, text: "ولم تقتصر إنجازات أمنمحات الثالث على مجالي الزراعة والتعدين فقط،" },
+                { start: 70.5, end: 72.5, text: "بل امتدت لتشمل مجال العمارة،" },
+                { start: 73.5, end: 80.0, text: "فقام بتشييد هرمين؛ أحدهما في دهشور في الجيزة المعروف بالهرم الأسود، والآخر في هوارة في الفيوم." }
+            ],
+            en: [
+                { start: 1.0, end: 3.5, text: "King Amenemhat III" },
+                { start: 4.5, end: 7.5, text: "He is one of the most important kings of the Middle Kingdom." },
+                { start: 9.0, end: 13.0, text: "He ascended the throne after the death of his father, Senusret III." },
+                { start: 13.5, end: 19.0, text: "His long reign was characterized by peace and the completion of many projects." },
+                { start: 20.5, end: 21.5, text: "His Works" },
+                { start: 22.5, end: 30.5, text: "King Amenemhat III sent numerous expeditions to extract minerals, such as turquoise and copper from the Sinai Peninsula," },
+                { start: 32.5, end: 35.0, text: "and granite from Aswan." },
+                { start: 36.0, end: 42.5, text: "As a result of the country experiencing periods of drought due to the low water levels of the Nile River," },
+                { start: 42.5, end: 52.5, text: "Amenemhat III saw that the Faiyum depression could serve as a natural reservoir to supply the country with water during periods of drought." },
+                { start: 53.0, end: 63.5, text: "He built a massive dam at the natural entrance of Lake Moeris (Lake Qarun today), known as the El-Lahun Dam, to regulate the entry and exit of water to the canal." },
+                { start: 64.5, end: 70.0, text: "The achievements of Amenemhat III were not limited to agriculture and mining alone," },
+                { start: 70.5, end: 72.5, text: "but extended to include the field of architecture," },
+                { start: 73.5, end: 80.0, text: "as he constructed two pyramids: one in Dahshur in Giza, known as the Black Pyramid, and the other in Hawara in Faiyum." }
+            ]
+        };
+
+        let currentLang = 'ar';
+        const video = document.getElementById('videoPlayer');
+        const subtitleOverlay = document.getElementById('custom-subtitle');
+
+        function setSubtitle(lang) {
+            currentLang = lang;
+            
+            // Update button styles
+            ['ar', 'en', 'off'].forEach(l => {
+                const btn = document.getElementById(`btn-${l}`);
+                if (l === lang) {
+                    btn.className = "px-3 py-1 text-xs rounded-lg font-semibold transition-all bg-amber-500 text-slate-950 shadow";
+                } else {
+                    btn.className = "px-3 py-1 text-xs rounded-lg font-semibold transition-all bg-transparent text-slate-300 hover:text-white";
+                }
+            });
+
+            if (lang === 'off') {
+                subtitleOverlay.classList.remove('visible');
+                subtitleOverlay.textContent = '';
+            } else {
+                updateSubtitles();
+            }
+        }
+
+        function updateSubtitles() {
+            if (currentLang === 'off') return;
+
+            const currentTime = video.currentTime;
+            const subs = subtitlesData[currentLang];
+            const currentSub = subs.find(sub => currentTime >= sub.start && currentTime <= sub.end);
+
+            if (currentSub) {
+                subtitleOverlay.textContent = currentSub.text;
+                // Set text direction based on language
+                subtitleOverlay.style.direction = currentLang === 'ar' ? 'rtl' : 'ltr';
+                subtitleOverlay.classList.add('visible');
+            } else {
+                subtitleOverlay.classList.remove('visible');
+            }
+        }
+
+        function restartVideo() {
+            video.currentTime = 0;
+            video.play();
+        }
+
+        // Hook timeupdate event to trigger custom subtitle updates
+        video.addEventListener('timeupdate', updateSubtitles);
+    </script>
+</body>
+</html>
